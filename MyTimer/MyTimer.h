@@ -1,6 +1,5 @@
 #pragma once
-#include <Windows.h>
-#include <vector>
+#include <chrono>
 
 namespace CRBTimer {
 	enum TimerStatus
@@ -19,15 +18,14 @@ namespace CRBTimer {
 		void Pause();
 		void Reset();
 		void CalculateTime();
-		void Display();
+		std::chrono::milliseconds GetTime();
 		TimerStatus GetStatus();
 
-	protected:
-		TimerStatus status;
-		UINT _freq;
-		LARGE_INTEGER _begin;
-		LARGE_INTEGER _end;
-		LONGLONG costTime;
-		UINT days, hours, minutes, seconds, milliseconds, microseconds;
+	private:
+		std::chrono::time_point<std::chrono::system_clock> m_start;
+		std::chrono::milliseconds m_time;
+		TimerStatus m_status;
+		std::chrono::milliseconds m_storeTime;
+		
 	};
 }

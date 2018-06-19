@@ -1,59 +1,45 @@
 #include "MyTimer.h"
-using namespace CRBTimer;
 
-MyTimer::MyTimer()
+CRBTimer::MyTimer::MyTimer()
 {
-	LARGE_INTEGER tmp;
-	QueryPerformanceFrequency(&tmp);
-	_freq = static_cast<int>(tmp.QuadPart);
-	costTime = 0;
-	days = hours = minutes = seconds = milliseconds = microseconds = 0u;
-	status = ZERO;
+	m_status = ZERO;
+	m_storeTime = std::chrono::milliseconds(0);
 }
 
-void MyTimer::Start()
+void CRBTimer::MyTimer::Start()
 {
-	if (status == RUN)
+	if (m_status == RUN)
 		return;
-	status = RUN;
-	QueryPerformanceCounter(&_begin);
+	m_start = std::chrono::system_clock::now();
+	m_status = TimerStatus::RUN;
 }
 
-void MyTimer::Pause()
+void CRBTimer::MyTimer::Pause()
 {
-	status = PAUSE;
+	m_status = PAUSE;
 	CalculateTime();
-
+	m_storeTime = m_time;
 }
 
-void MyTimer::Reset()
+void CRBTimer::MyTimer::Reset()
 {
-	status = ZERO;
-	costTime = 0;
-	microseconds = milliseconds = seconds = minutes = hours = days = 0;
+	m_status = ZERO;
+	m_time = std::chrono::milliseconds(0);
+	m_storeTime = std::chrono::milliseconds(0);
 }
 
-void MyTimer::CalculateTime()
+void CRBTimer::MyTimer::CalculateTime()
 {
-	QueryPerformanceCounter(&_end);
-	costTime += _end.QuadPart - _begin.QuadPart;
-	_begin = _end;
-	days = costTime * 1000000u / _freq;     //因为最后结果会保存到 days 变量中，此处可直接用 days 存储中间结果。  
-	microseconds = days % 1000u;
-	milliseconds = (days /= 1000u) % 1000u;
-	seconds = (days /= 1000u) % 60u;
-	minutes = (days /= 60u) % 60u;
-	hours = (days /= 60u) % 24u;
-	days = days / 24u;
+	auto thisTP = std::chrono::system_clock::now();
+	m_time = std::chrono::duration_cast<decltype(m_time)>(thisTP - m_start) + m_storeTime;
 }
 
-void MyTimer::Display()
+std::chrono::milliseconds CRBTimer::MyTimer::GetTime()
 {
-	printf_s("%2d:%02d\'%02d\"%03d%03d", hours, minutes, seconds,
-		milliseconds, microseconds);
+	return m_time;
 }
 
-TimerStatus MyTimer::GetStatus()
+CRBTimer::TimerStatus CRBTimer::MyTimer::GetStatus()
 {
-	return status;
+	return m_status;;
 }

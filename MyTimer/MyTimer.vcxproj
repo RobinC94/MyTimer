@@ -119,6 +119,7 @@
     <ClInclude Include="MyTimer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="console.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyTimer.cpp" />
   </ItemGroup>
